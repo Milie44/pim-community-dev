@@ -31,18 +31,19 @@ class Edit extends Form
                     'css'        => '.updated-since-parameter .controls',
                     'decorators' => ['Pim\Behat\Decorator\Export\Filter\UpdatedTimeConditionDecorator'],
                 ],
-                'Category tree' => [
+                'Category tree'          => [
                     'css'        => '.jstree',
-                    'decorators' => ['Pim\Behat\Decorator\Tree\JsTreeDecorator']
+                    'decorators' => ['Pim\Behat\Decorator\Tree\JsTreeDecorator'],
                 ],
-                'Available attributes' => [
+                'Available attributes'   => [
                     'css'        => '.add-attribute',
-                    'decorators' => ['Pim\Behat\Decorator\Common\AddAttributeDecorator']
+                    'decorators' => ['Pim\Behat\Decorator\Common\AddAttributeDecorator'],
                 ],
-                'Attribute selector' => [
+                'Attribute selector'     => [
                     'css'        => '.control-group.attributes',
-                    'decorators' => ['Pim\Behat\Decorator\Export\Structure\AttributesDecorator']
+                    'decorators' => ['Pim\Behat\Decorator\Export\Structure\AttributesDecorator'],
                 ],
+                'Tabs'                   => ['css' => '#form-navbar'],
             ],
             $this->elements
         );
@@ -61,5 +62,25 @@ class Edit extends Form
         }, 'Cannot find the add attribute element');
 
         $availableAttribute->addAttributes($attributes);
+    }
+
+    /**
+     * Get the form tab containg $tab text
+     *
+     * @param string $tab
+     *
+     * @return NodeElement|null
+     */
+    public function getFormTab($tab)
+    {
+        try {
+            $node = $this->spin(function () use ($tab) {
+                return $this->getElement('Tabs')->find('css', sprintf('a:contains("%s")', $tab));
+            }, sprintf('Cannot find form tab "%s"', $tab));
+        } catch (\Exception $e) {
+            $node = null;
+        }
+
+        return $node;
     }
 }

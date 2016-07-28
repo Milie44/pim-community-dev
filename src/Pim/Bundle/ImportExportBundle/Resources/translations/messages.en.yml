@@ -76,10 +76,12 @@ pim_importexport:
         export_profile:
             index: View export profiles list
             create: Create an export profile
-            properties_show: Show an export profile general properties
-            properties_edit: Edit an export profile general properties
+            show: Show an export profile
+            edit: Edit an export profile
             remove: Remove an export profile
             launch: Launch an export profile
+            property_edit: Edit an export profile general properties
+            property_show: Show an export profile general properties
             history: View export profile history
             content_edit: Edit an export profile content
             content_show: Show an export profile content
