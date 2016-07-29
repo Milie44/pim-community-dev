@@ -10,30 +10,32 @@ Feature: Ensures acl are respected on the export profile tabs
     And I am on the "Catalog manager" role page
     And I visit the "Permissions" tab
 
-  Scenario: Should not see the general properties tab
+  Scenario: Disable show general property right
     Given I revoke rights to resources Show an export profile general properties
     And I grant rights to resources Show an export profile content
     And I save the role
     When I am on the "csv_footwear_product_export" export job page
-    Then I should be on the "Content" tab
+    Then I should not see the text "General properties"
 
-  Scenario: Should not see the general properties and content tab
+  Scenario: Disable show general property and show content tab read rights
     Given I revoke rights to resources Show an export profile general properties
     And I revoke rights to resources Show an export profile content
     And I save the role
     When I am on the "csv_footwear_product_export" export job page
-    Then I should be on the "History" tab
+    Then I should not see the text "General properties"
+    And I should not see the text "Content"
 
-  Scenario: Should not be able to edit the general properties job profile
+  Scenario: Disable edit general property right
     Given I revoke rights to resources Edit an export profile general properties
     And I grant rights to resources Edit an export profile content
     And I save the role
     When I am on the "csv_footwear_product_export" export job edit page
-    Then I should be on the "Content" tab
+    Then I should not see the text "General properties"
 
-  Scenario: Should not be able to edit the general properties and content tab
+  Scenario: Disable edit general property and show content tab read rights
     Given I revoke rights to resources Edit an export profile general properties
     And I revoke rights to resources Edit an export profile content
     And I save the role
     When I am on the "csv_footwear_product_export" export job edit page
-    Then I should be on the "History" tab
+    Then I should not see the text "General properties"
+    And I should not see the text "Content"

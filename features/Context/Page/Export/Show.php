@@ -29,7 +29,6 @@ class Show extends JobShow
             $this->elements,
             [
                 'Export now button' => ['css' => '.navbar-buttons .export-btn'],
-                'Tabs' => ['css' => '#form-navbar']
             ]
         );
     }
@@ -44,25 +43,5 @@ class Show extends JobShow
 
             return true;
         }, 'Cannot launch the export');
-    }
-
-    /**
-     * Get the form tab containg $tab text
-     *
-     * @param string $tab
-     *
-     * @return NodeElement|null
-     */
-    public function getFormTab($tab)
-    {
-        try {
-            $node = $this->spin(function () use ($tab) {
-                return $this->getElement('Tabs')->find('css', sprintf('a:contains("%s")', $tab));
-            }, sprintf('Cannot find form tab "%s"', $tab));
-        } catch (\Exception $e) {
-            $node = null;
-        }
-
-        return $node;
     }
 }
