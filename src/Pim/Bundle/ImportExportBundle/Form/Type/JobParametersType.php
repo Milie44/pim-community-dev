@@ -105,30 +105,6 @@ class JobParametersType extends AbstractType implements DataMapperInterface
                 }
             }
         );
-
-        $builder->addEventListener(
-            FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) {
-                $form = $event->getForm();
-                $jobInstance = $form->getRoot()->getData();
-                if (null === $jobInstance->getId()) {
-                    return;
-                }
-                $job            = $this->jobRegistry->get($jobInstance->getJobName());
-                $configProvider = $this->configProviderRegistry->get($job);
-                $configs        = $configProvider->getFormConfiguration();
-
-                $data = $event->getData();
-
-                foreach (array_keys($configs) as $parameter) {
-                    if ('filters' === $parameter) {
-                        $data[$parameter] = json_decode($data[$parameter], true);
-                    }
-                }
-
-                $event->setData($data);
-            }
-        );
     }
 
     /**

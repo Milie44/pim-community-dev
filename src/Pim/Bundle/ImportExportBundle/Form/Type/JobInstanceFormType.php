@@ -4,8 +4,11 @@ namespace Pim\Bundle\ImportExportBundle\Form\Type;
 
 use Akeneo\Component\Batch\Job\JobParametersFactory;
 use Akeneo\Component\Batch\Job\JobRegistry;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Pim\Bundle\EnrichBundle\Form\Subscriber\DisableFieldSubscriber;
 use Pim\Bundle\ImportExportBundle\Form\DataTransformer\ConfigurationToJobParametersTransformer;
+use Pim\Bundle\ImportExportBundle\Form\Subscriber\ContentSubscriber;
+use Pim\Bundle\ImportExportBundle\Form\Subscriber\GeneralPropertiesSubscriber;
 use Pim\Bundle\ImportExportBundle\Form\Subscriber\JobInstanceSubscriber;
 use Pim\Bundle\ImportExportBundle\JobLabel\TranslatedLabelProvider;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -45,6 +48,7 @@ class JobInstanceFormType extends AbstractType
      * @param TranslatorInterface     $translator
      * @param TranslatedLabelProvider $jobLabelProvider
      * @param JobParametersFactory    $jobParametersFactory
+     * @param SecurityFacade          $securityFacade
      */
     public function __construct(
         JobRegistry $jobRegistry,
@@ -69,8 +73,6 @@ class JobInstanceFormType extends AbstractType
             ->addConnectorField($builder)
             ->addJobNameField($builder)
             ->addJobConfigurationField($builder);
-
-        $builder->addEventSubscriber(new JobInstanceSubscriber());
 
         foreach ($this->subscribers as $subscriber) {
             $builder->addEventSubscriber($subscriber);

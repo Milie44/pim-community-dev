@@ -1,0 +1,24 @@
+parameters:
+    pim_import_export.form.subscriber.job_instance_subscriber.class: Pim\Bundle\ImportExportBundle\Form\Subscriber\JobInstanceSubscriber
+    pim_import_export.form.subscriber.general_properties_subscriber.class: Pim\Bundle\ImportExportBundle\Form\Subscriber\GeneralPropertiesSubscriber
+    pim_import_export.form.subscriber.content_subscriber.class: Pim\Bundle\ImportExportBundle\Form\Subscriber\ContentSubscriber
+
+services:
+    pim_import_export.form.subscriber.job_instance_subscriber:
+        class: '%pim_import_export.form.subscriber.job_instance_subscriber.class%'
+        tags:
+            - { name: form.job_instance, priority: 90 }
+
+    pim_import_export.form.subscriber.general_properties_subscriber:
+        class: '%pim_import_export.form.subscriber.general_properties_subscriber.class%'
+        arguments:
+            - '@oro_security.security_facade'
+        tags:
+            - { name: form.job_instance, priority: 80 }
+
+    pim_import_export.form.subscriber.content_subscriber:
+        class: '%pim_import_export.form.subscriber.content_subscriber.class%'
+        arguments:
+            - '@oro_security.security_facade'
+        tags:
+            - { name: form.job_instance, priority: 70 }

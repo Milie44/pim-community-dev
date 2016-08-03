@@ -3,6 +3,7 @@
 namespace Pim\Bundle\ImportExportBundle;
 
 use Pim\Bundle\EnrichBundle\DependencyInjection\Reference\ReferenceFactory;
+use Pim\Bundle\ImportExportBundle\DependencyInjection\Compiler\RegisterJobInstanceFormTypeSubscriberPass;
 use Pim\Bundle\ImportExportBundle\DependencyInjection\Compiler\RegisterJobParametersFormsOptionsPass;
 use Pim\Bundle\ImportExportBundle\DependencyInjection\Compiler\RegisterJobTemplatePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -24,6 +25,7 @@ class PimImportExportBundle extends Bundle
     {
         $container
             ->addCompilerPass(new RegisterJobTemplatePass())
-            ->addCompilerPass(new RegisterJobParametersFormsOptionsPass(new ReferenceFactory()));
+            ->addCompilerPass(new RegisterJobParametersFormsOptionsPass(new ReferenceFactory()))
+            ->addCompilerPass(new RegisterJobInstanceFormTypeSubscriberPass(new ReferenceFactory()));
     }
 }

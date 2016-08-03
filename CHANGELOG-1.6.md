@@ -30,7 +30,7 @@
 - PIM-5781: Add new data on the "system information" screen (data volumetry, information about the operating system)
 - PIM-5110: Add product export configuration to customize product media export policy
 - PIM-5494: Add export invalid item in xslx
-- PIM-5798: Add permission on export job profile tabs
+- PIM-5798: Add permissions on export job profile tabs
 
 ## Scalability improvements
 
