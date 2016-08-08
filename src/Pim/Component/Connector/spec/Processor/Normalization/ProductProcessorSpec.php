@@ -3,10 +3,12 @@
 namespace spec\Pim\Component\Connector\Processor\Normalization;
 
 use Akeneo\Component\Batch\Item\DataInvalidItem;
+use Akeneo\Component\Batch\Item\ExecutionContext;
 use Akeneo\Component\Batch\Job\JobParameters;
 use Akeneo\Component\Batch\Model\JobExecution;
 use Akeneo\Component\Batch\Model\JobInstance;
 use Akeneo\Component\Batch\Model\StepExecution;
+use Akeneo\Component\Batch\Step\WorkingDirectoryAwareInterface;
 use Akeneo\Component\StorageUtils\Detacher\ObjectDetacherInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use PhpSpec\ObjectBehavior;
@@ -122,7 +124,8 @@ class ProductProcessorSpec extends ObjectBehavior
         JobExecution $jobExecution,
         JobInstance $jobInstance,
         ProductValueInterface $identifier,
-        ArrayCollection $valuesCollection
+        ArrayCollection $valuesCollection,
+        ExecutionContext $executionContext
     ) {
         $stepExecution->getJobParameters()->willReturn($jobParameters);
         $jobParameters->get('filePath')->willReturn('/my/path/product.csv');
@@ -144,11 +147,13 @@ class ProductProcessorSpec extends ObjectBehavior
         $product->getValues()->willReturn($valuesCollection);
         $identifier->getData()->willReturn('AKIS_XS');
 
+        $jobExecution->getExecutionContext()->willReturn($executionContext);
+        $executionContext->get(WorkingDirectoryAwareInterface::CONTEXT_PARAMETER)->willReturn('/working/directory/');
+
         $stepExecution->getJobExecution()->willReturn($jobExecution);
         $jobExecution->getJobInstance()->willReturn($jobInstance);
         $jobExecution->getId()->willReturn(100);
         $jobInstance->getCode()->willReturn('csv_product_export');
-        $directory = '/my/path/csv_product_export/100/';
 
         $productStandard = [
             'values' => [
@@ -168,7 +173,7 @@ class ProductProcessorSpec extends ObjectBehavior
         $normalizer->normalize($product, 'json', ['channels' => ['foobar'], 'locales' => ['en_US']])
             ->willReturn($productStandard);
 
-        $mediaFetcher->fetchAll($valuesCollection, $directory, 'AKIS_XS')->shouldBeCalled();
+        $mediaFetcher->fetchAll($valuesCollection, '/working/directory/', 'AKIS_XS')->shouldBeCalled();
         $mediaFetcher->getErrors()->willReturn([]);
 
         $this->process($product)->shouldReturn($productStandard);
@@ -190,7 +195,8 @@ class ProductProcessorSpec extends ObjectBehavior
         JobExecution $jobExecution,
         JobInstance $jobInstance,
         ProductValueInterface $identifier,
-        ArrayCollection $valuesCollection
+        ArrayCollection $valuesCollection,
+        ExecutionContext $executionContext
     ) {
         $stepExecution->getJobParameters()->willReturn($jobParameters);
         $jobParameters->get('filePath')->willReturn('/my/path/product.csv');
@@ -212,11 +218,13 @@ class ProductProcessorSpec extends ObjectBehavior
         $product->getValues()->willReturn($valuesCollection);
         $identifier->getData()->willReturn('AKIS_XS');
 
+        $jobExecution->getExecutionContext()->willReturn($executionContext);
+        $executionContext->get(WorkingDirectoryAwareInterface::CONTEXT_PARAMETER)->willReturn('/working/directory/');
+
         $stepExecution->getJobExecution()->willReturn($jobExecution);
         $jobExecution->getJobInstance()->willReturn($jobInstance);
         $jobExecution->getId()->willReturn(100);
         $jobInstance->getCode()->willReturn('csv_product_export');
-        $directory = '/my/path/csv_product_export/100/';
 
         $productStandard = [
             'values' => [
@@ -231,7 +239,7 @@ class ProductProcessorSpec extends ObjectBehavior
         $normalizer->normalize($product, 'json', ['channels' => ['foobar'], 'locales' => ['en_US']])
             ->willReturn($productStandard);
 
-        $mediaFetcher->fetchAll($valuesCollection, $directory, 'AKIS_XS')->shouldBeCalled();
+        $mediaFetcher->fetchAll($valuesCollection, '/working/directory/', 'AKIS_XS')->shouldBeCalled();
         $mediaFetcher->getErrors()->willReturn(
             [
                 [

@@ -7,6 +7,7 @@ use Akeneo\Component\Batch\Item\ItemProcessorInterface;
 use Akeneo\Component\Batch\Job\JobParameters;
 use Akeneo\Component\Batch\Model\StepExecution;
 use Akeneo\Component\Batch\Step\StepExecutionAwareInterface;
+use Akeneo\Component\Batch\Step\WorkingDirectoryAwareInterface;
 use Akeneo\Component\StorageUtils\Detacher\ObjectDetacherInterface;
 use Pim\Component\Catalog\Builder\ProductBuilderInterface;
 use Pim\Component\Catalog\Model\ProductInterface;
@@ -22,7 +23,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  * @copyright 2016 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class ProductProcessor implements ItemProcessorInterface, StepExecutionAwareInterface
+class ProductProcessor implements ItemProcessorInterface, StepExecutionAwareInterface, WorkingDirectoryAwareInterface
 {
     /** @var NormalizerInterface */
     protected $normalizer;
@@ -93,8 +94,7 @@ class ProductProcessor implements ItemProcessorInterface, StepExecutionAwareInte
         }
 
         if ($parameters->has('with_media') && $parameters->get('with_media')) {
-            $directory = $this->getWorkingDirectory($parameters->get('filePath'));
-            $this->fetchMedia($product, $directory);
+            $this->fetchMedia($product, $this->getWorkingDirectory());
         }
 
         $this->detacher->detach($product);
@@ -108,6 +108,16 @@ class ProductProcessor implements ItemProcessorInterface, StepExecutionAwareInte
     public function setStepExecution(StepExecution $stepExecution)
     {
         $this->stepExecution = $stepExecution;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getWorkingDirectory()
+    {
+        return $this->stepExecution->getJobExecution()->getExecutionContext()->get(
+            WorkingDirectoryAwareInterface::CONTEXT_PARAMETER
+        );
     }
 
     /**
@@ -175,25 +185,5 @@ class ProductProcessor implements ItemProcessorInterface, StepExecutionAwareInte
     {
         return isset($parameters->get('filters')['structure']['attributes'])
             && !empty($parameters->get('filters')['structure']['attributes']);
-    }
-
-    /**
-     * Build path of the working directory to import media in a specific directory.
-     * Will be extracted with TIP-539
-     *
-     * @param string $filePath
-     *
-     * @return string
-     */
-    protected function getWorkingDirectory($filePath)
-    {
-        $jobExecution = $this->stepExecution->getJobExecution();
-
-        return dirname($filePath)
-            . DIRECTORY_SEPARATOR
-            . $jobExecution->getJobInstance()->getCode()
-            . DIRECTORY_SEPARATOR
-            . $jobExecution->getId()
-            . DIRECTORY_SEPARATOR;
     }
 }

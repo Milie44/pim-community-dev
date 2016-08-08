@@ -8,6 +8,7 @@ use Akeneo\Component\Batch\Item\ItemWriterInterface;
 use Akeneo\Component\Batch\Job\JobParameters;
 use Akeneo\Component\Batch\Model\StepExecution;
 use Akeneo\Component\Batch\Step\StepExecutionAwareInterface;
+use Akeneo\Component\Batch\Step\WorkingDirectoryAwareInterface;
 use Akeneo\Component\Buffer\BufferFactory;
 use Pim\Component\Catalog\Repository\AttributeRepositoryInterface;
 use Pim\Component\Connector\ArrayConverter\ArrayConverterInterface;
@@ -23,6 +24,7 @@ abstract class AbstractItemMediaWriter implements
     ItemWriterInterface,
     InitializableInterface,
     FlushableInterface,
+    WorkingDirectoryAwareInterface,
     StepExecutionAwareInterface
 {
     /** @var ArrayConverterInterface */
@@ -107,8 +109,7 @@ abstract class AbstractItemMediaWriter implements
         $flatItems = [];
         foreach ($items as $item) {
             if ($parameters->has('with_media') && $parameters->get('with_media')) {
-                $directory = $this->getWorkingDirectory($parameters->get('filePath'));
-                $item = $this->resolveMediaPaths($item, $directory);
+                $item = $this->resolveMediaPaths($item, $this->getWorkingDirectory());
             }
 
             $flatItems[] = $this->arrayConverter->convert($item, $converterOptions);
@@ -166,6 +167,16 @@ abstract class AbstractItemMediaWriter implements
     public function setStepExecution(StepExecution $stepExecution)
     {
         $this->stepExecution = $stepExecution;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getWorkingDirectory()
+    {
+        return $this->stepExecution->getJobExecution()->getExecutionContext()->get(
+            WorkingDirectoryAwareInterface::CONTEXT_PARAMETER
+        );
     }
 
     /**
@@ -281,25 +292,5 @@ abstract class AbstractItemMediaWriter implements
         }
 
         return $options;
-    }
-
-    /**
-     * Build path of the working directory to import media in a specific directory.
-     * Will be extracted with TIP-539
-     *
-     * @param string $filePath
-     *
-     * @return string
-     */
-    protected function getWorkingDirectory($filePath)
-    {
-        $jobExecution = $this->stepExecution->getJobExecution();
-
-        return dirname($filePath)
-               . DIRECTORY_SEPARATOR
-               . $jobExecution->getJobInstance()->getCode()
-               . DIRECTORY_SEPARATOR
-               . $jobExecution->getId()
-               . DIRECTORY_SEPARATOR;
     }
 }

@@ -6,6 +6,7 @@ use Akeneo\Component\Batch\Item\FlushableInterface;
 use Akeneo\Component\Batch\Item\InitializableInterface;
 use Akeneo\Component\Batch\Item\ItemWriterInterface;
 use Akeneo\Component\Batch\Step\StepExecutionAwareInterface;
+use Akeneo\Component\Batch\Step\WorkingDirectoryAwareInterface;
 use Pim\Component\Connector\Writer\File\AbstractItemMediaWriter;
 use Pim\Component\Connector\Writer\File\ArchivableWriterInterface;
 
@@ -21,6 +22,7 @@ class VariantGroupWriter extends AbstractItemMediaWriter implements
     InitializableInterface,
     FlushableInterface,
     StepExecutionAwareInterface,
+    WorkingDirectoryAwareInterface,
     ArchivableWriterInterface
 {
     /**

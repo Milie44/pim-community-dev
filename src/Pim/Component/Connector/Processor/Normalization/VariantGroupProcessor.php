@@ -7,6 +7,7 @@ use Akeneo\Component\Batch\Item\ItemProcessorInterface;
 use Akeneo\Component\Batch\Job\JobParameters;
 use Akeneo\Component\Batch\Model\StepExecution;
 use Akeneo\Component\Batch\Step\StepExecutionAwareInterface;
+use Akeneo\Component\Batch\Step\WorkingDirectoryAwareInterface;
 use Akeneo\Component\StorageUtils\Detacher\ObjectDetacherInterface;
 use Akeneo\Component\StorageUtils\Updater\ObjectUpdaterInterface;
 use Pim\Component\Catalog\Model\GroupInterface;
@@ -22,7 +23,10 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  * @copyright 2015 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class VariantGroupProcessor implements ItemProcessorInterface, StepExecutionAwareInterface
+class VariantGroupProcessor implements
+    ItemProcessorInterface,
+    StepExecutionAwareInterface,
+    WorkingDirectoryAwareInterface
 {
     /** @var StepExecution */
     protected $stepExecution;
@@ -70,13 +74,22 @@ class VariantGroupProcessor implements ItemProcessorInterface, StepExecutionAwar
         $parameters = $this->stepExecution->getJobParameters();
 
         if ($parameters->has('with_media') && $parameters->get('with_media')) {
-            $directory = $this->getWorkingDirectory($parameters->get('filePath'));
-            $this->fetchMedia($variantGroup, $directory);
+            $this->fetchMedia($variantGroup, $this->getWorkingDirectory());
         }
 
         $this->objectDetacher->detach($variantGroup);
 
         return $variantGroupStandard;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getWorkingDirectory()
+    {
+        return $this->stepExecution->getJobExecution()->getExecutionContext()->get(
+            WorkingDirectoryAwareInterface::CONTEXT_PARAMETER
+        );
     }
 
     /**
@@ -107,25 +120,5 @@ class VariantGroupProcessor implements ItemProcessorInterface, StepExecutionAwar
         foreach ($this->mediaFetcher->getErrors() as $error) {
             $this->stepExecution->addWarning($error['message'], [], new DataInvalidItem($error['media']));
         }
-    }
-
-    /**
-     * Build path of the working directory to import media in a specific directory.
-     * Will be extracted with TIP-539
-     *
-     * @param string $filePath
-     *
-     * @return string
-     */
-    protected function getWorkingDirectory($filePath)
-    {
-        $jobExecution = $this->stepExecution->getJobExecution();
-
-        return dirname($filePath)
-            . DIRECTORY_SEPARATOR
-            . $jobExecution->getJobInstance()->getCode()
-            . DIRECTORY_SEPARATOR
-            . $jobExecution->getId()
-            . DIRECTORY_SEPARATOR;
     }
 }
