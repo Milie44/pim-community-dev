@@ -42,7 +42,7 @@
 
 6. Then remove your old upgrades folder:
     ```
-     rm upgrades/ -rf
+     rm $PIM_DIR/upgrades/ -rf
     ```
 
 7. Now you're ready to update your dependencies:
@@ -55,6 +55,24 @@
             "your/other-dependencies": "version",
         }
         ```
+
+        If your project uses the "akeneo-labs/pim-enhanced-connector" bundle, please use the following version,
+
+        ```
+        "require": {
+            "akeneo-labs/pim-enhanced-connector": "1.3.*"
+        }
+        ```
+
+        If your project uses the "akeneo-labs/custom-entity-bundle" bundle, please use the following version,
+
+        ```
+        "require": {
+            "akeneo-labs/pim-enhanced-connector": "1.8.*"
+        }
+        ```
+
+        // TODO, add others bundles once migrated
 
         Especially if you store your product in Mongo, don't forget to add `doctrine/mongodb-odm-bundle`:
 
@@ -72,6 +90,10 @@
         ```
 
         This step will also copy the upgrades folder from `vendor/akeneo/pim-community-dev/` to your Pim project root to allow you to migrate.
+
+        If you have custom code in your project, this step may raise errors in the "post-script" command.
+
+        In this case you need to follow the next chapter "Migrate your custom code" before to run the database migration.
 
 8. Then you can migrate your database using:
 
@@ -253,6 +275,11 @@ class PimConnectorExtension extends Extension
         $loader->load('steps.yml');
     }
 }
+```
+
+You can list the batch_jobs.yml file you need to migrate by using the following command,
+```
+    grep -rl 'batch_jobs.yml' src/*
 ```
 
 #### Remove the `Akeneo\Component\Batch\Item\AbstractConfigurableStepElement`
