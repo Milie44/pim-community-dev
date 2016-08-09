@@ -2,12 +2,10 @@
 
 namespace spec\Pim\Component\Connector\Writer\File\Csv;
 
-use Akeneo\Component\Batch\Item\ExecutionContext;
 use Akeneo\Component\Batch\Job\JobParameters;
 use Akeneo\Component\Batch\Model\JobExecution;
 use Akeneo\Component\Batch\Model\JobInstance;
 use Akeneo\Component\Batch\Model\StepExecution;
-use Akeneo\Component\Batch\Step\WorkingDirectoryAwareInterface;
 use PhpSpec\ObjectBehavior;
 use Pim\Component\Catalog\Repository\AttributeRepositoryInterface;
 use Pim\Component\Connector\ArrayConverter\ArrayConverterInterface;
@@ -61,8 +59,7 @@ class ProductWriterSpec extends ObjectBehavior
         StepExecution $stepExecution,
         JobParameters $jobParameters,
         JobExecution $jobExecution,
-        JobInstance $jobInstance,
-        ExecutionContext $executionContext
+        JobInstance $jobInstance
     ) {
         $this->setStepExecution($stepExecution);
         $stepExecution->getJobParameters()->willReturn($jobParameters);
@@ -139,7 +136,7 @@ class ProductWriterSpec extends ObjectBehavior
             'description-en_US-mobile'    => 'Simple description',
             'description-fr_FR-ecommerce' => 'Une description merveilleuse...',
             'description-fr_FR-mobile'    => 'Une simple description',
-            'media'                       => 'files/jackets/media/it\'s the filename.jpg',
+            'media'                       => 'a/b/c/d/it_s_the_filename.jpg',
         ];
 
         $productStandard2 = [
@@ -178,14 +175,11 @@ class ProductWriterSpec extends ObjectBehavior
 
         $items = [$productStandard1, $productStandard2];
 
-        $jobExecution->getExecutionContext()->willReturn($executionContext);
-        $executionContext->get(WorkingDirectoryAwareInterface::CONTEXT_PARAMETER)->willReturn($this->directory);
-
         $stepExecution->getJobExecution()->willReturn($jobExecution);
         $jobExecution->getJobInstance()->willReturn($jobInstance);
         $jobExecution->getId()->willReturn(100);
         $jobInstance->getCode()->willReturn('csv_product_export');
-        $productPathMedia1 = $this->directory . 'files/jackets/media/';
+        $productPathMedia1 = $this->directory . 'csv_product_export/100/files/jackets/media/';
         $originalFilename = "it's the filename.jpg";
 
         $this->filesystem->mkdir($productPathMedia1);
