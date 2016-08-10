@@ -93,17 +93,17 @@ class ProductProcessor extends AbstractProcessor implements ItemProcessorInterfa
         }
 
         $jobParameters = $this->stepExecution->getJobParameters();
-        $enabledComparison = $jobParameters->get('enabledComparison');
-        if ($enabledComparison) {
-            $filteredItem = $this->filterIdenticalData($product, $filteredItem);
-
-            if (empty($filteredItem) && null !== $product->getId()) {
-                $this->detachProduct($product);
-                $this->stepExecution->incrementSummaryInfo('product_skipped_no_diff');
-
-                return null;
-            }
-        }
+//        $enabledComparison = $jobParameters->get('enabledComparison');
+//        if ($enabledComparison) {
+//            $filteredItem = $this->filterIdenticalData($product, $filteredItem);
+//
+//            if (empty($filteredItem) && null !== $product->getId()) {
+//                $this->detachProduct($product);
+//                $this->stepExecution->incrementSummaryInfo('product_skipped_no_diff');
+//
+//                return null;
+//            }
+//        }
 
         try {
             $this->updateProduct($product, $filteredItem);
